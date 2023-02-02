@@ -66,5 +66,6 @@ class AllModels(models.Model):
     category = models.ForeignKey(Category,on_delete=models.CASCADE)
     subcategory = models.ForeignKey(SubCategory, on_delete=models.CASCADE,null=True,blank=True,default=None)
     product = models.ForeignKey(Product,on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField(default=1, blank=True, null=True)
     created_at = models.DateTimeField(auto_now=True)
 

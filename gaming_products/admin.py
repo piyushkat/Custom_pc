@@ -18,5 +18,5 @@ admin.site.register(Product,ProductAdmin)
 
 
 class AllModelAdmin(admin.ModelAdmin):
-    list_display = ('user','category','subcategory','product')
+    list_display = ('user','category','subcategory','product','quantity')
 admin.site.register(AllModels,AllModelAdmin)
