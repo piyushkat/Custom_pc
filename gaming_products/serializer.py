@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from gaming_products.models import *
+from gaming_products.models import *    
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
@@ -23,4 +23,4 @@ class ProductSerializer(serializers.ModelSerializer):
 class AllModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = AllModels
-        fields = ['category','subcategory','product']
+        fields = ['category','subcategory','product','quantity']

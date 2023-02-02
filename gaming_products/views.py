@@ -123,9 +123,14 @@ class GetCatSubPro(GenericAPIView):
       if not self.request.user.is_authenticated:
         return Response({'msg':'user not found'})
       category = Category.objects.get(id=id)
+      quantity = int(request.data['quantity'])
       sub_category = SubCategory.objects.filter(category=category,id=request.data['sub_category']).first()
       product = Product.objects.filter(category=category,subcategory=sub_category,id=request.data['product']).first()
-      res = AllModels.objects.create(user=self.request.user,category=category,subcategory=sub_category,product=product)
+      try:
+        res = AllModels.objects.get(user=self.request.user,category=category,subcategory=sub_category,product=product)
+        res.quantity += quantity
+      except:
+        res = AllModels.objects.create(user=self.request.user,category=category,subcategory=sub_category,product=product,quantity=quantity)
       res.save()
       serializer = AllModelSerializer(res)
       return Response({"status": "success", "data": serializer.data}, status = 200)
