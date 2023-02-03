@@ -39,6 +39,17 @@ class Product(models.Model):
     created_at = models.DateTimeField(auto_now=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'description':self.description,
+            'price':self.price
+
+
+            # other fields as needed
+        }
+
 
     def __str__(self):
         return self.name
@@ -73,7 +84,7 @@ class AllModels(models.Model):
 class CustomGamingPc(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)
     category = models.ForeignKey(Category,on_delete=models.CASCADE,related_name='categories',default=None)
-    product = models.ManyToManyField(Product,related_name='products')
+    product = models.ManyToManyField(Product,related_name='products',max_length=3)
     price = models.IntegerField(default=None)
     created_at = models.DateTimeField(auto_now=True)
 

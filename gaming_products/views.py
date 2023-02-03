@@ -185,20 +185,40 @@ class CreateCustomGamingPc(GenericAPIView):
       category = Category.objects.get(id=id[0])
       products = Product.objects.filter(category=category, id__in=request.data['product'])
       price = request.data.get('price')
-      res = CustomGamingPc.objects.filter(user=self.request.user,category=category)
-      if res.exists():
-          res = res.first()
-          res.product.add(*products)
+      if len(products)> 3:
+        return Response({'msg':'Only Select Three'})
       else:
-          res = CustomGamingPc.objects.create(user=self.request.user,category=category,price=price)
-          res.product.set(products)
-      res.save()
-      serializer = CustomGaminPcSerializer(res)
-      return Response({'msg':'Success','data':serializer.data},status=200)
+        res = CustomGamingPc.objects.filter(user=self.request.user,category=category)
+        if res.exists():
+            res = res.first()
+            res.product.add(*products)
+        else:
+            res = CustomGamingPc.objects.create(user=self.request.user,category=category,price=price)
+            res.product.set(products)
+        res.save()
+        serializer = CustomGaminPcSerializer(res)
+        return Response({'msg':'Success','data':serializer.data},status=200)
 
 class GetCustomGamingPc(GenericAPIView):
-  def get(self,request):
-    if not self.request.user.is_authenticated:
-      return Response({'msg':'User Not Found'})
-    custom_game = CustomGamingPc.objects.filter(user=self.request.user)
-    print(custom_game)
+  def get(self, request):
+    if not request.user.is_authenticated:
+        return Response({'msg': 'User not found'})
+
+    custom_game = CustomGamingPc.objects.filter(user=self.request.user).first()
+    if custom_game is None:
+        return Response({'msg': 'Custom gaming PC not found'})
+
+    products = Product.objects.filter(category=custom_game.category)
+    diff = 0
+    closest_match = None
+    min_diff = float('inf')
+    for product in products:
+        diff += abs(custom_game.price - product.price)
+        if diff <= min_diff:
+            closest_match = product
+            min_diff = diff
+
+    if closest_match.price == custom_game.price:
+        return Response({'msg': 'Success', 'data': closest_match.to_dict()}, status=200)
+    else:
+        return Response({'msg': 'Success', 'data': closest_match.to_dict()}, status=200)
