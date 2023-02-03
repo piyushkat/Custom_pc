@@ -1,5 +1,5 @@
 from django.contrib import admin
-from gaming_products.models import Category,SubCategory,Product,AllModels
+from gaming_products.models import Category,SubCategory,Product,AllModels,CustomGamingPc
 # Register your models here.
 
 class CategoryAdmin(admin.ModelAdmin):
@@ -20,3 +20,9 @@ admin.site.register(Product,ProductAdmin)
 class AllModelAdmin(admin.ModelAdmin):
     list_display = ('user','category','subcategory','product','quantity')
 admin.site.register(AllModels,AllModelAdmin)
+
+
+class CustomGamingPcAdmin(admin.ModelAdmin):
+    fields = ['user','category','product','price']
+    list_display = ('id','user','price','created_at')
+admin.site.register(CustomGamingPc,CustomGamingPcAdmin)
