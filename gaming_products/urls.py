@@ -13,7 +13,7 @@ urlpatterns = [
     path('getallproduct',GetAllProduct.as_view(), name='getallproduct'),
     path('getbyuser',GetAllModel.as_view(), name='getbyuser'),
     path('customgaming/<int:id>',CreateCustomGamingPc.as_view(), name='customgaming'),
-    # path('getcustomgaming',GetCustomGamingPc.as_view(), name='getcustomgaming'),
+    path('getcustomgaming',GetCustomGamingPc.as_view(), name='getcustomgaming'),
     # path('addproductbycategory/<int:id>',AddProductByCategory.as_view(), name='getbyuser'),
 
 ]
