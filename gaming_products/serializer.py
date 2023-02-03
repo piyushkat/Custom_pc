@@ -24,3 +24,10 @@ class AllModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = AllModels
         fields = ['category','subcategory','product','quantity']
+
+
+class CustomGaminPcSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomGamingPc
+        fields = ['user','category','product','price','created_at']
+

@@ -41,13 +41,15 @@ class AddSubCategory(GenericAPIView):
   serializer_class = SubCategorySeriaizer
   renderer_classes = [UserRenderer]
   def post(self,request):
-    try:
-        serializer = SubCategorySeriaizer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response({"status": "success", "data": serializer.data}, status = 200)
-    except:
-        return Response({'msg':'Not Added','status':400})
+    if not self.request.user.is_authenticated:
+      return Response({'msg':'user not found'})
+    name = request.data.get('name')
+    category = Category.objects.get(id=request.data['category'])
+    sub_category = SubCategory.objects.create(user=self.request.user,name=name,category=category)
+    sub_category.save()
+    serializer = SubCategorySeriaizer(sub_category)
+    return Response({"status": "success", "data": serializer.data}, status = 200)
+
 
 
 class GetSubCategory(GenericAPIView):
@@ -60,29 +62,26 @@ class GetSubCategory(GenericAPIView):
 
 
 class AddProduct(GenericAPIView):
-  serializer_class = ProductSerializer
-  renderer_classes = UserRenderer
   def post(self,request):
-    try:
-      if not self.request.user.is_authenticated:
-        return Response({'msg':'user not found'})
-      name = request.data.get('name')
-      description = request.data.get('description')
-      quantity = request.data.get('quantity')
-      price = request.data.get('price')
-      category = Category.objects.filter(id=request.data['category']).first()
-      subcategory = SubCategory.objects.filter(category=category,id=request.data['subcategory']).first()
-      product = Product.objects.create(user=self.request.user,name=name,description=description,subcategory=subcategory,category=category,quantity=quantity,price=price)
-      product.save()
-      serializer = ProductSerializer(product)
-      return Response({'msg':'success','data':serializer.data},status=200)
-    except:
-      return Response({"status": "Not found "}, status = 400)
+    if not self.request.user.is_authenticated:
+      return Response({'msg':'user not found'})
+    print("nfi")
+    # try:
+    name = request.data.get('name')
+    description = request.data.get('description')
+    quantity = request.data.get('quantity')
+    price = request.data.get('price')
+    category = Category.objects.get(id=request.data['category'])
+    sub_category = SubCategory.objects.filter(category=category,id=request.data['sub_category']).first()
+    product = Product.objects.create(user=self.request.user,name=name,description=description,quantity=quantity,price=price,category=category,subcategory=sub_category)
+    product.save()
+    serializer = ProductSerializer(product)
+    return Response({"status": "success", "data": serializer.data}, status = 200)
+
 
 
 class GetAllProduct(GenericAPIView):
   serializer_class = ProductSerializer
-  renderer_classes = [UserRenderer]
   def get(self,request):
     items = Product.objects.all()
     serializer = ProductSerializer(items,many=True)
@@ -94,7 +93,6 @@ class GetProductByCategory(GenericAPIView):
   :return: All the product shown by the category.
   """
   serializer_class = ProductSerializer
-  renderer_classes = [UserRenderer]
   def get(self,request,id):
     try:
       res = Product.objects.filter(category=id)
@@ -106,7 +104,6 @@ class GetProductByCategory(GenericAPIView):
 
 class GetProductBySubcategory(GenericAPIView):
   serializer_class = ProductSerializer
-  renderer_classes = [UserRenderer]
   def get(self,request,id):
     if not self.request.user.is_authenticated:
       return Response({'msg':'User Not Found'})
@@ -117,7 +114,6 @@ class GetProductBySubcategory(GenericAPIView):
 
 class GetCatSubPro(GenericAPIView):
   serializer_class = AllModelSerializer
-  renderer_classes = [UserRenderer]
   def post(self,request,id):
     try:
       if not self.request.user.is_authenticated:
@@ -140,7 +136,6 @@ class GetCatSubPro(GenericAPIView):
 
 class GetAllModel(GenericAPIView):
   serializer_class = AllModelSerializer
-  renderer_classes = [UserRenderer]
   def get(self,request):
     if not self.request.user.is_authenticated:
       return Response({'msg':'User Not Found'})
@@ -162,3 +157,48 @@ class GetAllModel(GenericAPIView):
 #       return Response({'msg':'Success','data':serializer.data},status=200)
 #     except:
 #       return Response({"status": "Not found "}, status = 400)
+
+# class CreateCustomGamingPc(GenericAPIView):
+#     serializer_class = CustomGaminPcSerializer
+#     renderer_classes = [UserRenderer]
+#     def post(self,request,id):
+#         category = Category.objects.get(id=id)
+#         products = Product.objects.filter(category=category, id=request.data['product'])
+#         price = request.data.get('price')
+#         res = CustomGamingPc.objects.filter(user=self.request.user,category=category)
+#         if res.exists():
+#             res = res.first()
+#             res.product.add(*products)
+#         else:
+#             res = CustomGamingPc.objects.create(user=self.request.user,category=category,price=price)
+#             res.product.set(products)
+#         res.save()
+#         serializer = CustomGaminPcSerializer(res)
+#         return Response({'msg':'Success','data':serializer.data},status=200)
+
+class CreateCustomGamingPc(GenericAPIView):
+    serializer_class = CustomGaminPcSerializer
+    renderer_classes = [UserRenderer]
+    
+    def post(self, request, id):
+      id = [id] if not isinstance(id, list) else id
+      category = Category.objects.get(id=id[0])
+      products = Product.objects.filter(category=category, id__in=request.data['product'])
+      price = request.data.get('price')
+      res = CustomGamingPc.objects.filter(user=self.request.user,category=category)
+      if res.exists():
+          res = res.first()
+          res.product.add(*products)
+      else:
+          res = CustomGamingPc.objects.create(user=self.request.user,category=category,price=price)
+          res.product.set(products)
+      res.save()
+      serializer = CustomGaminPcSerializer(res)
+      return Response({'msg':'Success','data':serializer.data},status=200)
+
+class GetCustomGamingPc(GenericAPIView):
+  def get(self,request):
+    if not self.request.user.is_authenticated:
+      return Response({'msg':'User Not Found'})
+    custom_game = CustomGamingPc.objects.filter(user=self.request.user)
+    print(custom_game)

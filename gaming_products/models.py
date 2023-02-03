@@ -1,9 +1,9 @@
 import random
 from django.db import models
 from django.conf import settings
+from django.contrib.auth.models import User
 User = settings.AUTH_USER_MODEL
 # Create your models here.
-
 
 class Category(models.Model):
     user = models.ForeignKey(User,on_delete=models.CASCADE)
@@ -67,5 +67,13 @@ class AllModels(models.Model):
     subcategory = models.ForeignKey(SubCategory, on_delete=models.CASCADE,null=True,blank=True,default=None)
     product = models.ForeignKey(Product,on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now=True)
+
+
+class CustomGamingPc(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)
+    category = models.ForeignKey(Category,on_delete=models.CASCADE,related_name='categories',default=None)
+    product = models.ManyToManyField(Product,related_name='products')
+    price = models.IntegerField(default=None)
     created_at = models.DateTimeField(auto_now=True)
 
