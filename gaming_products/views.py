@@ -32,6 +32,8 @@ class GetAllCategory(GenericAPIView):
   serializer_class = CategorySerializer
   renderer_classes = [UserRenderer]
   def get(self, request):
+      if not self.request.user.is_authenticated:
+        return Response({'msg':'User Not Found'})
       items = Category.objects.all()
       serializer = CategorySerializer(items, many=True)
       return Response({"status": "success", "data": serializer.data}, status = 200)
@@ -51,11 +53,12 @@ class AddSubCategory(GenericAPIView):
     return Response({"status": "success", "data": serializer.data}, status = 200)
 
 
-
 class GetSubCategory(GenericAPIView):
   serializer_class = SubCategorySeriaizer
   renderer_classes = [UserRenderer]
   def get(self,request):
+    if not self.request.user.is_authenticated:
+      return Response({'msg':'User Not Found'})
     items = SubCategory.objects.all()
     serializer = SubCategorySeriaizer(items,many=True)
     return Response({"status": "success", "data": serializer.data}, status = 200)
@@ -65,8 +68,6 @@ class AddProduct(GenericAPIView):
   def post(self,request):
     if not self.request.user.is_authenticated:
       return Response({'msg':'user not found'})
-    print("nfi")
-    # try:
     name = request.data.get('name')
     description = request.data.get('description')
     quantity = request.data.get('quantity')
@@ -83,6 +84,8 @@ class AddProduct(GenericAPIView):
 class GetAllProduct(GenericAPIView):
   serializer_class = ProductSerializer
   def get(self,request):
+    if not self.request.user.is_authenticated:
+      return Response({'msg':'User Not Found'})
     items = Product.objects.all()
     serializer = ProductSerializer(items,many=True)
     return Response({"status": "success", "data": serializer.data}, status = 200)
@@ -94,6 +97,8 @@ class GetProductByCategory(GenericAPIView):
   """
   serializer_class = ProductSerializer
   def get(self,request,id):
+    if not self.request.user.is_authenticated:
+      return Response({'msg':'User Not Found'})
     try:
       res = Product.objects.filter(category=id)
       serializer =  ProductSerializer(res, many=True)
@@ -179,8 +184,9 @@ class GetAllModel(GenericAPIView):
 class CreateCustomGamingPc(GenericAPIView):
     serializer_class = CustomGaminPcSerializer
     renderer_classes = [UserRenderer]
-    
     def post(self, request, id):
+      if not self.request.user.is_authenticated:
+        return Response({'msg':'User Not Found'})
       id = [id] if not isinstance(id, list) else id
       category = Category.objects.get(id=id[0])
       products = Product.objects.filter(category=category, id__in=request.data['product'])
@@ -199,15 +205,15 @@ class CreateCustomGamingPc(GenericAPIView):
         serializer = CustomGaminPcSerializer(res)
         return Response({'msg':'Success','data':serializer.data},status=200)
 
+
 class GetCustomGamingPc(GenericAPIView):
   def get(self, request):
-    if not request.user.is_authenticated:
+    if not self.request.user.is_authenticated:
         return Response({'msg': 'User not found'})
 
     custom_game = CustomGamingPc.objects.filter(user=self.request.user).first()
     if custom_game is None:
         return Response({'msg': 'Custom gaming PC not found'})
-
     products = Product.objects.filter(category=custom_game.category)
     diff = 0
     closest_match = None
@@ -217,7 +223,6 @@ class GetCustomGamingPc(GenericAPIView):
         if diff <= min_diff:
             closest_match = product
             min_diff = diff
-
     if closest_match.price == custom_game.price:
         return Response({'msg': 'Success', 'data': closest_match.to_dict()}, status=200)
     else:
