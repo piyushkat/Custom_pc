@@ -30,7 +30,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-AUTH_USER_MODEL = 'authenticate.User'
+AUTH_USER_MODEL = 'authenticate.CustomUser'
 # Application definition
 
 INSTALLED_APPS = [

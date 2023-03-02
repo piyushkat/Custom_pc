@@ -2,11 +2,11 @@ import random
 from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import User
-User = settings.AUTH_USER_MODEL
+
 # Create your models here.
 
 class Category(models.Model):
-    user = models.ForeignKey(User,on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)
     name = models.CharField(max_length=255,default=None)
     created_at = models.DateTimeField(auto_now=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -16,7 +16,7 @@ class Category(models.Model):
 
 
 class SubCategory(models.Model):
-    user = models.ForeignKey(User,on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='subcategories',blank=True)
     created_at = models.DateTimeField(auto_now=True)
@@ -27,7 +27,7 @@ class SubCategory(models.Model):
 
 
 class Product(models.Model):
-    user = models.ForeignKey(User,on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     description = models.CharField(max_length=1000,default=None)
     subcategory = models.ForeignKey(SubCategory, on_delete=models.CASCADE, related_name='subcategory',null=True,blank=True,default=None)
@@ -73,7 +73,7 @@ class Product(models.Model):
 
 
 class AllModels(models.Model):
-    user = models.ForeignKey(User,on_delete=models.CASCADE,default=None)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE,default=None)
     category = models.ForeignKey(Category,on_delete=models.CASCADE)
     subcategory = models.ForeignKey(SubCategory, on_delete=models.CASCADE,null=True,blank=True,default=None)
     product = models.ForeignKey(Product,on_delete=models.CASCADE)
@@ -87,4 +87,3 @@ class CustomGamingPc(models.Model):
     product = models.ManyToManyField(Product,related_name='products',max_length=3)
     price = models.IntegerField(default=None)
     created_at = models.DateTimeField(auto_now=True)
-
