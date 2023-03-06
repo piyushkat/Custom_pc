@@ -215,7 +215,7 @@ class UserChangePasswordView(GenericAPIView):
       return Response({'msg':'Password Changed Successfully'}, status = 200)
     return Response({'msg':'Old Password entered incorrectly '}, status=403)
 
-
+  
 class UpdateUserProfile(GenericAPIView):
   serializer_class = UserUpdateProfileSerializer
   renderer_classes = [UserRenderer]
