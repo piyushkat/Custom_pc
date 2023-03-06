@@ -36,6 +36,7 @@ class GetCheckoutCart(GenericAPIView):
 
 
 class CustomGamingCart(GenericAPIView):
+    serializer_class = CustomGamingPcCheckoutSerializer
     def post(self,request):
         if not self.request.user.is_authenticated:
             return Response({'msg':'User Not Found'})
@@ -46,5 +47,5 @@ class CustomGamingCart(GenericAPIView):
         cart_values = CheckoutCart.objects.create(user=self.request.user, shipping=shipping_cost, total=totals)
         cart_values.custom_gaming_pc.set(custom_gaming)
         cart_values.save()
-        serializer = CustomGamingPcCheckoutSerializer(cart_values)
+        serializer = CustomGamingPcCheckoutSerializer(cart_values,many=True)
         return Response({'msg':'Success','data':serializer.data},status=200)

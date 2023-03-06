@@ -182,8 +182,7 @@ class GetAllModel(GenericAPIView):
 #         return Response({'msg':'Success','data':serializer.data},status=200)
 
 class CreateCustomGamingPc(GenericAPIView):
-    serializer_class = CustomGaminPcSerializer
-    renderer_classes = [UserRenderer]
+    serializer_class = CustomGaminPcSerializer  
     def post(self, request, id):
       if not self.request.user.is_authenticated:
         return Response({'msg':'User Not Found'})
